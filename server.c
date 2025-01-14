@@ -15,18 +15,26 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+char	char[8];
+int		idx = 0;
+
 void	handler(int num)
 {
 	if (num == SIGUSR1)
+		message[idx] = '0';
+	else
+		message[idx] = '1';
+	idx++;
+	if (idx == 8)
 	{
-		printf("Sample message.\n");
+		ft_printf(char);
 	}
-	exit(0);
 }
 
 int	main(void)
 {
 	signal(SIGUSR1, handler);
+	signal(SIGUSR2, handler);
 	while (1)
 	{
 		printf("%d\n", getpid());
