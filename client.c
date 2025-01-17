@@ -6,7 +6,7 @@
 /*   By: riyano <riyano@student.42london.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 17:26:37 by riyano            #+#    #+#             */
-/*   Updated: 2025/01/13 17:51:39 by riyano           ###   ########.fr       */
+/*   Updated: 2025/01/16 20:06:35 by riyano           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,69 +15,61 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "./libft/libft.h"
+#include "./minitalk.h"
 
-//TOOD: convert String to binary and pass them to kill function using SIGUSR1/2
-//int	convert_to_binary(char c)
-//{
-//	int	binary;
-//
-//	(c >> i) & 1
-//}
+static int	recieved = 0;
 
-void	handler(int num)
+void	handler(int sig)
 {
-	int bit;
-
-	if (num == SIGUSR1)
-		bit = 0;
-		
+	if (sig == SIGUSR1)
+		recieved = 1;
+	else
+		ft_putstr_fd("Server has recieved every message.\n", 1);
 }
 
 void	send_signal(int pid, char *str)
 {
-	printf("send_signal function is executed.\n");
 	char	c;
 	int		i;
-	int		result;
 
-	while (*str)
+	while (1)
 	{
 		c = *str++;
 		i = 7;
 		while (i >= 0)
 		{
-			if (((c >> i) & 1) == 1) // means 1
-			{
-				result = kill(pid, SIGUSR2);
-				printf("Sent SIGUSR2\n");
-			}
-			else // means 0
-			{
-				result = kill(pid, SIGUSR1);
-				printf("Sent SIGUSR1\n");
-			}
-			if (result != 0)
-			{
-				printf("Failed to send signal.\n");
-				exit(0);
-			}
-			usleep(100000);
+			if (((c >> i) & 1) == 1)
+				kill_wrapper(pid, SIGUSR2);
+			else
+				kill_wrapper(pid, SIGUSR1);
+			while (!recieved)
+				usleep(100);
+			recieved =  0;
 			i--;
 		}
+		if (c == '\0')
+			break ;
 	}
-	printf("Message sent.\n");
 }
 
 int	main(int argc, char *argv[])
 {
 	if (argc != 3)
 		return (0);
-	//signal(SIGUSR1, handler);
-	//signal(SIGUSR2, handler);
-	send_signal(ft_atoi(argv[1]), argv[2]);
-	while (1)
+	if (signal(SIGUSR1, handler) < 0)
 	{
-		pause();
+		ft_putstr_fd("SIGUSR1 signal failed\n", 1);
+		exit(EXIT_FAILURE);
 	}
+	if (signal(SIGUSR2, handler) < 0)
+	{
+		ft_putstr_fd("SIGUSR2 signal failed\n", 1);
+		exit(EXIT_FAILURE);
+	}
+	send_signal(ft_atoi(argv[1]), argv[2]);
+//	while (1)
+//	{
+//		pause();
+//	}
 	return (0);
 }

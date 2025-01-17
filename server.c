@@ -14,30 +14,58 @@
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "./libft/libft.h"
+#include "./minitalk.h"
 
-char	char[8];
-int		idx = 0;
-
-void	handler(int num)
+void	handler(int signo, siginfo_t *info, void *context)
 {
-	if (num == SIGUSR1)
-		message[idx] = '0';
-	else
-		message[idx] = '1';
-	idx++;
-	if (idx == 8)
+	static char	c;
+	static int	bit_count;
+	pid_t		client_pid;
+
+	(void)context;
+	client_pid = info->si_pid;
+	c <<= 1;
+	if (signo == SIGUSR2)
+		c |= 1;
+	bit_count++;
+	if (bit_count == 8)
 	{
-		ft_printf(char);
+		if (c == '\0')
+		{
+			ft_putchar_fd('\n', 1);
+			kill_wrapper(client_pid, SIGUSR2);
+			return ;
+		}
+		ft_putchar_fd(c, 1);
+		c = 0;
+		bit_count = 0;
 	}
+	kill_wrapper(client_pid, SIGUSR1);
 }
 
 int	main(void)
 {
-	signal(SIGUSR1, handler);
-	signal(SIGUSR2, handler);
+	struct sigaction	sa;
+
+	ft_putstr_fd("Server PID: ", 1);
+	ft_putnbr_fd(getpid(), 1);
+	ft_putchar_fd('\n', 1);
+	sa.sa_sigaction = handler;
+	sa.sa_flags = SA_SIGINFO;
+	//sigemptyset(&sa.sa_mask);
+	if (sigaction(SIGUSR1, &sa, NULL) < 0)
+	{
+		ft_putstr_fd("sigacton SIGUSR1 failed\n", 1);
+		exit(EXIT_FAILURE);
+	}
+	if (sigaction(SIGUSR2, &sa, NULL) < 0)
+	{
+		ft_putstr_fd("sigaction SIGUSR2 failed\n", 1);
+		exit(EXIT_FAILURE);
+	}
 	while (1)
 	{
-		printf("%d\n", getpid());
 		pause();
 	}
 	return (0);
