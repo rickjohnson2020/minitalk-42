@@ -19,9 +19,9 @@
 
 void	handler(int signo, siginfo_t *info, void *context)
 {
-	static char	c;
-	static int	bit_count;
-	pid_t		client_pid;
+	static unsigned char	c;
+	static int				bit_count;
+	pid_t					client_pid;
 
 	(void)context;
 	client_pid = info->si_pid;
@@ -35,6 +35,8 @@ void	handler(int signo, siginfo_t *info, void *context)
 		{
 			ft_putchar_fd('\n', 1);
 			kill_wrapper(client_pid, SIGUSR2);
+			c = 0;
+			bit_count = 0;
 			return ;
 		}
 		ft_putchar_fd(c, 1);
@@ -51,9 +53,12 @@ int	main(void)
 	ft_putstr_fd("Server PID: ", 1);
 	ft_putnbr_fd(getpid(), 1);
 	ft_putchar_fd('\n', 1);
+	ft_memset(&sa, 0, sizeof(sa));
 	sa.sa_sigaction = handler;
 	sa.sa_flags = SA_SIGINFO;
-	//sigemptyset(&sa.sa_mask);
+	sigemptyset(&sa.sa_mask);
+	//sigaddset(&sa.sa_mask, SIGUSR1);
+	//sigaddset(&sa.sa_mask, SIGUSR2);
 	if (sigaction(SIGUSR1, &sa, NULL) < 0)
 	{
 		ft_putstr_fd("sigacton SIGUSR1 failed\n", 1);

@@ -17,24 +17,42 @@
 #include "./libft/libft.h"
 #include "./minitalk.h"
 
-static int	recieved = 0;
+volatile sig_atomic_t	recieved = 0;
 
 void	handler(int sig)
 {
 	if (sig == SIGUSR1)
 		recieved = 1;
 	else
+	{
 		ft_putstr_fd("Server has recieved every message.\n", 1);
+		exit(0);
+	}
 }
 
-void	send_signal(int pid, char *str)
+static void	send_null_bits(int pid)
 {
-	char	c;
+	int	i;
+
+	i = 0;
+	while (i < 8)
+	{
+		kill_wrapper(pid, SIGUSR1);
+		while (!recieved)
+			usleep(100);
+		recieved = 0;
+		i++;
+	}
+}
+
+static void	send_message(int pid, char *str)
+{
+	unsigned char	c;
 	int		i;
 
-	while (1)
+	while (*str)
 	{
-		c = *str++;
+		c = (unsigned char)*str++;
 		i = 7;
 		while (i >= 0)
 		{
@@ -47,9 +65,8 @@ void	send_signal(int pid, char *str)
 			recieved =  0;
 			i--;
 		}
-		if (c == '\0')
-			break ;
 	}
+	send_null_bits(pid);
 }
 
 int	main(int argc, char *argv[])
@@ -66,10 +83,10 @@ int	main(int argc, char *argv[])
 		ft_putstr_fd("SIGUSR2 signal failed\n", 1);
 		exit(EXIT_FAILURE);
 	}
-	send_signal(ft_atoi(argv[1]), argv[2]);
-//	while (1)
-//	{
-//		pause();
-//	}
+	send_message(ft_atoi(argv[1]), argv[2]);
+	//while (1)
+	//{
+	//	pause();
+	//}
 	return (0);
 }
