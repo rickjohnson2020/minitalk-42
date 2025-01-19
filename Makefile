@@ -6,44 +6,62 @@
 #    By: riyano <riyano@student.42london.com>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/17 17:58:42 by riyano            #+#    #+#              #
-#    Updated: 2025/01/17 19:34:22 by riyano           ###   ########.fr        #
+#    Updated: 2025/01/19 13:11:02 by riyano           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 SERVER = server
 CLIENT = client
-SRCS_SERVER = server.c utils.c
-SRCS_CLIENT = client.c utils.c
-OBJS_SERVER = $(SRCS_SERVER:.c=.o)
-OBJS_CLIENT = $(SRCS_CLIENT:.c=.o)
+NAME = $(SERVER) $(CLIENT)
+
+SERVER_BONUS = server_bonus
+CLIENT_BONUS = client_bonus
+NAME_BONUS = $(SERVER_BONUS) $(CLIENT_BONUS)
+
+SRCS = server.c client.c utils.c
+OBJS = $(SRCS:.c=.o)
+
+SRCS_BONUS = server_bonus.c client_bonus.c utils_bonus.c
+OBJS_BONUS = $(SRCS_BONUS:.c=.o)
+
 CC = cc
 CFLAGS = -Wall -Wextra -Werror
+
 LIBFT_DIR = ./libft
 LIBFT = $(LIBFT_DIR)/libft.a
 
-all: $(SERVER) $(CLIENT)
+RM = rm -f
 
-$(SERVER): $(OBJS_SERVER)
+all: $(NAME)
+
+$(SERVER): server.o utils.o
 	@$(MAKE) -C $(LIBFT_DIR)
-	$(CC) $(CFLAGS) -o $(SERVER) $(OBJS_SERVER) -L$(LIBFT_DIR) -lft
+	$(CC) $(CFLAGS) $^ -o $@ -L$(LIBFT_DIR) -lft
 
-$(CLIENT): $(OBJS_CLIENT)
+$(CLIENT): client.o utils.o
 	@$(MAKE) -C $(LIBFT_DIR)
-	$(CC) $(CFLAGS) -o $(CLIENT) $(OBJS_CLIENT) -L$(LIBFT_DIR) -lft
+	$(CC) $(CFLAGS) $^ -o $@ -L$(LIBFT_DIR) -lft
 
-#bonus: $(OBJS) $(BOBJS)
-#	ar rcs $(NAME) $(OBJS) $(BOBJS)
+bonus: $(NAME_BONUS)
+
+$(SERVER_BONUS): server_bonus.o utils_bonus.o
+	@$(MAKE) -C $(LIBFT_DIR)
+	$(CC) $(CFLAGS) $^ -o $@ -L$(LIBFT_DIR) -lft
+
+$(CLIENT_BONUS): client_bonus.o utils_bonus.o
+	@$(MAKE) -C $(LIBFT_DIR)
+	$(CC) $(CFLAG) $^ -o $@ -L$(LIBFT_DIR) -lft
 
 %.o: %.c minitalk.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OBJS_SERVER) $(OBJS_CLIENT)
+	$(RM) $(OBJS) $(OBJS_BONUS)
 	@$(MAKE) -C $(LIBFT_DIR) clean
 
 fclean: clean
-	rm -f $(SERVER) $(CLIENT) $(LIBFT)
+	$(RM) $(SERVER) $(CLIENT) $(SERVER_BONUS) $(CLIENT_BONUS) $(LIBFT)
 
 re: fclean all
 
-.PHONY: all clean fclean re
+.PHONY: all bonus clean fclean re

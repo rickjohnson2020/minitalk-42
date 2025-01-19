@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   server.c                                           :+:      :+:    :+:   */
+/*   server_bonus.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: riyano <riyano@student.42london.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/13 16:31:29 by riyano            #+#    #+#             */
-/*   Updated: 2025/01/13 18:53:24 by riyano           ###   ########.fr       */
+/*   Created: 2025/01/19 11:40:21 by riyano            #+#    #+#             */
+/*   Updated: 2025/01/19 11:41:15 by riyano           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "./libft/libft.h"
-#include "./minitalk.h"
+#include "./minitalk_bonus.h"
 
 static void	check_and_reset(pid_t pid, unsigned char *c, int *count)
 {
@@ -39,7 +39,7 @@ static void	send_recieved_signal(pid_t pid, unsigned char *c, int *count)
 	*count = 0;
 }
 
-static void	handler(int signo, siginfo_t *info, void *context)
+void	handler(int signo, siginfo_t *info, void *context)
 {
 	static unsigned char	c;
 	static int				bit_count;
@@ -47,7 +47,7 @@ static void	handler(int signo, siginfo_t *info, void *context)
 
 	(void)context;
 	client_pid = info->si_pid;
-	check_and_reset(client_pid, &c, &bit_count);
+	check_and_reset(client_pid, &c, *bit_count);
 	c <<= 1;
 	if (signo == SIGUSR2)
 		c |= 1;

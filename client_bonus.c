@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   client.c                                           :+:      :+:    :+:   */
+/*   client_bonus.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: riyano <riyano@student.42london.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/13 17:26:37 by riyano            #+#    #+#             */
-/*   Updated: 2025/01/16 20:06:35 by riyano           ###   ########.fr       */
+/*   Created: 2025/01/19 11:38:47 by riyano            #+#    #+#             */
+/*   Updated: 2025/01/19 11:40:08 by riyano           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,11 +15,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "./libft/libft.h"
-#include "./minitalk.h"
+#include "./minitalk_bonus.h"
 
 volatile sig_atomic_t	g_recieved = 0;
 
-static void	handler(int sig)
+void	handler(int sig)
 {
 	if (sig == SIGUSR1)
 		g_recieved = 1;
@@ -30,7 +30,7 @@ static void	handler(int sig)
 	}
 }
 
-static void	send_message(int pid, char *str)
+void	send_message(int pid, char *str)
 {
 	unsigned char	c;
 	int				i;
