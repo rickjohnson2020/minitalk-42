@@ -58,7 +58,10 @@ static void	send_message(int pid, char *str)
 int	main(int argc, char *argv[])
 {
 	if (argc != 3)
+	{
+		ft_putstr_fd("Usage: ./client <PID> <message>\n", 1);
 		return (0);
+	}
 	if (signal(SIGUSR1, handler) < 0)
 	{
 		ft_putstr_fd("SIGUSR1 signal failed\n", 1);

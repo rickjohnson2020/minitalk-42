@@ -41,13 +41,13 @@ static void	send_recieved_signal(pid_t pid, unsigned char *c, int *count)
 
 void	handler(int signo, siginfo_t *info, void *context)
 {
-	static unsigned char	c;
-	static int				bit_count;
+	static unsigned char	c = 0;
+	static int				bit_count = 0;
 	pid_t					client_pid;
 
 	(void)context;
 	client_pid = info->si_pid;
-	check_and_reset(client_pid, &c, *bit_count);
+	check_and_reset(client_pid, &c, &bit_count);
 	c <<= 1;
 	if (signo == SIGUSR2)
 		c |= 1;
@@ -73,7 +73,7 @@ int	main(void)
 	ft_putstr_fd("Server PID: ", 1);
 	ft_putnbr_fd(getpid(), 1);
 	ft_putchar_fd('\n', 1);
-	ft_bzero(&sa, 0);
+	ft_bzero(&sa, sizeof(sa));
 	sa.sa_sigaction = handler;
 	sa.sa_flags = SA_SIGINFO;
 	sigemptyset(&sa.sa_mask);
