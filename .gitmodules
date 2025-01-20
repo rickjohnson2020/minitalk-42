@@ -1,0 +1,3 @@
+[submodule "libft"]
+	path = libft
+	url = git@github.com:rickjohnson2020/libft-42.git
